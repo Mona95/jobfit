@@ -1,0 +1,18 @@
+# Environment variables — never commit
+.env
+.env.local
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# PyCharm
+.idea/
+/shelf/
+/workspace.xml
+
+# Alembic
+alembic/versions/*.pyc
