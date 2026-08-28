@@ -3,6 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 
+from app.database import Base
+from app.models.user import User
+from app.models.cv import CV
+from app.models.job import Job
+
+from app.routes.auth import router as auth_router
+from app.routes.cv import router as cv_router
+
 load_dotenv()
 
 app = FastAPI(title="JobFit API", version="1.0.0")
@@ -19,6 +27,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register routers
+app.include_router(auth_router)
+app.include_router(cv_router)
 
 @app.get("/api/health")
 def health():
