@@ -6,6 +6,8 @@ from app.models.user import User
 from app.schemas.cv import CVResponse, CVListResponse
 from app.services.pdf import extract_text_from_pdf, validate_pdf
 from app.middleware.auth import get_current_user
+from app.services.rag import index_cv, delete_cv_index
+
 
 router = APIRouter(prefix="/api/cv", tags=["cv"])
 
@@ -44,6 +46,15 @@ async def upload_cv(
     db.add(cv)
     db.commit()
     db.refresh(cv)
+
+    # Index in ChromaDB — this is the new part
+    chunks_indexed = index_cv(
+        user_id=current_user.id,
+        cv_id=cv.id,
+        cv_text=content
+    )
+
+    print(f"✅ CV indexed: {chunks_indexed} chunks stored in ChromaDB")
 
     return cv
 
@@ -87,6 +98,10 @@ def delete_cv(
 
     if cv is None:
         raise HTTPException(404, detail="CV not found")
+
+
+    # Remove from ChromaDB first
+    delete_cv_index(user_id=current_user.id, cv_id=cv_id)
 
     db.delete(cv)
     db.commit()
