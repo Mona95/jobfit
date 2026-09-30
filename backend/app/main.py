@@ -10,6 +10,7 @@ from app.models.job import Job
 
 from app.routes.auth import router as auth_router
 from app.routes.cv import router as cv_router
+from app.routes.analysis import router as analysis_router
 
 load_dotenv()
 
@@ -31,6 +32,7 @@ app.add_middleware(
 # Register routers
 app.include_router(auth_router)
 app.include_router(cv_router)
+app.include_router(analysis_router)
 
 @app.get("/api/health")
 def health():

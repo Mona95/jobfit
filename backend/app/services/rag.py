@@ -1,13 +1,8 @@
 import chromadb
-from chromadb.utils import embedding_functions
 import os
 from typing import List
 
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
-
-embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
-    model_name="all-MiniLM-L6-v2"
-)
 
 def get_collection(user_id: str):
     """
@@ -15,9 +10,21 @@ def get_collection(user_id: str):
     Each user has their own isolated collection.
     """
     return chroma_client.get_or_create_collection(
-        name=f"cv_{user_id}",
-        embedding_function=embedding_function
+        name=f"cv_{user_id}"
     )
+
+def get_or_index_cv(user_id: str, cv_id: str, cv_content: str, query: str, n_results: int = 8) -> list[str]:
+    """
+    Search ChromaDB for relevant CV sections.
+    If not indexed yet — automatically indexes first, then searches.
+    """
+    cv_sections = search_cv(user_id, query, n_results)
+
+    if not cv_sections:
+        index_cv(user_id, cv_id, cv_content)
+        cv_sections = search_cv(user_id, query, n_results)
+
+    return cv_sections
 
 def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> List[str]:
     """
