@@ -7,6 +7,7 @@ from app.database import Base
 from app.models.user import User
 from app.models.cv import CV
 from app.models.job import Job
+from app.models.analysis import AnalysisResult
 
 from app.routes.auth import router as auth_router
 from app.routes.cv import router as cv_router

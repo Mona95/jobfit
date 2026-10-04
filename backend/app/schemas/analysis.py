@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+from datetime import datetime
 from typing import Optional
 
 class AnalysisRequest(BaseModel):
@@ -31,7 +32,7 @@ class TailoringResponse(BaseModel):
 
 class CoverLetterRequest(BaseModel):
     cv_id: str
-    job_description: str
+    job_id: str
     company_name: str
     role_title: str
     tone: str = "professional"
@@ -54,3 +55,20 @@ class InterviewQuestion(BaseModel):
 class InterviewPrepResponse(BaseModel):
     questions: list[InterviewQuestion]
     preparation_tips: list[str]
+
+class JobAnalysisRequest(BaseModel):
+    cv_id: str
+    job_id: str
+
+class JobAnalysisResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    cv_id: str
+    job_id: str
+    analysis: Optional[dict] = None
+    tailoring: Optional[dict] = None
+    cover_letter: Optional[dict] = None
+    interview_prep: Optional[dict] = None
+    created_at: datetime
+    updated_at: datetime
