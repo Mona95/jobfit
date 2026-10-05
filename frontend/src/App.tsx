@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './stores/auth'
-
-// Pages — we'll build these next
+import DashboardLayout from './layouts/DashboardLayout'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
@@ -10,22 +9,20 @@ import AnalyzePage from './pages/AnalyzePage'
 import JobsPage from './pages/JobsPage'
 import CoverLetterPage from './pages/CoverLetterPage'
 import InterviewPrepPage from './pages/InterviewPrepPage'
+import CVDetailPage from './pages/CVDetailPage.tsx'
 
-// Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const isAuthenticated = useAuthStore(state => state.isAuthenticated())
     if (!isAuthenticated) return <Navigate to="/login" replace />
-    return <>{children}</>
+    return <DashboardLayout>{children}</DashboardLayout>
 }
 
 function App() {
     return (
         <Routes>
-            {/* Public routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
-            {/* Protected routes */}
             <Route path="/dashboard" element={
                 <ProtectedRoute><DashboardPage /></ProtectedRoute>
             } />
@@ -45,9 +42,12 @@ function App() {
                 <ProtectedRoute><InterviewPrepPage /></ProtectedRoute>
             } />
 
-            {/* Default redirect */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+            <Route path="/cv/:id" element={
+                <ProtectedRoute><CVDetailPage /></ProtectedRoute>
+            } />
         </Routes>
     )
 }
