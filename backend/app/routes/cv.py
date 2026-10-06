@@ -202,6 +202,11 @@ def delete_cv(
     if cv is None:
         raise HTTPException(404, detail="CV not found")
 
+    # Delete analysis results first — foreign key constraint
+    db.query(AnalysisResult).filter(
+        AnalysisResult.cv_id == cv_id
+    ).delete()
+
     # Delete PDF from disk
     if cv.file_path and os.path.exists(cv.file_path):
         os.remove(cv.file_path)

@@ -7,6 +7,8 @@ import Input from '../components/ui/Input'
 import Card from '../components/ui/Card'
 import Alert from '../components/ui/Alert'
 import ConfirmModal from '../components/ui/ConfirmModal'
+import { useToast } from '../stores/toast'
+import { CVCardSkeleton, StatCardSkeleton } from '../components/ui/Skeleton'
 
 interface UploadFormData {
     title: string
@@ -17,11 +19,20 @@ interface UploadFormData {
 function UploadForm({ onClose }: { onClose: () => void }) {
     const uploadMutation = useUploadCV()
     const { register, handleSubmit, formState: { errors } } = useForm<UploadFormData>()
+    const toast = useToast()
 
     const onSubmit = (data: UploadFormData) => {
         uploadMutation.mutate(
             { title: data.title, label: data.label || null, file: data.file[0] },
-            { onSuccess: onClose }
+            {
+                onSuccess: () => {
+                    toast.success('CV uploaded successfully')
+                    onClose()
+                },
+                onError: () => {
+                    toast.error('Failed to upload CV')
+                }
+            }
         )
     }
 
@@ -75,7 +86,15 @@ function UploadForm({ onClose }: { onClose: () => void }) {
 function CVStatsSection() {
     const { data: stats, isLoading } = useCVStats()
 
-    if (isLoading) return <p className="text-gray-500 text-sm">Loading stats...</p>
+    if (isLoading) return (
+        <div className="mb-8">
+            <h2 className="text-white font-semibold mb-3">CV Performance</h2>
+            <div className="flex flex-col gap-3">
+                <StatCardSkeleton />
+                <StatCardSkeleton />
+            </div>
+        </div>
+    )
     if (!stats?.length) return null
 
     return (
@@ -118,6 +137,7 @@ export default function CVPage() {
     const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null)
     const { data: cvs, isLoading, error } = useCVList()
     const deleteMutation = useDeleteCV()
+    const toast = useToast()
 
     const handleDelete = (id: string, title: string) => {
         setDeleteTarget({ id, title })
@@ -125,9 +145,15 @@ export default function CVPage() {
 
     const confirmDelete = () => {
         if (!deleteTarget) return
-        deleteMutation.mutate(deleteTarget.id, {
-            onSuccess: () => setDeleteTarget(null)
-        })
+        deleteMutation.mutate(deleteTarget.id,{
+            onSuccess: () => {
+            setDeleteTarget(null)
+            toast.success(`"${deleteTarget.title}" deleted`)
+        },
+            onError: () => {
+            toast.error('Failed to delete CV')
+        }
+    })
     }
 
     return (
@@ -155,7 +181,11 @@ export default function CVPage() {
             <h2 className="text-white font-semibold mb-3">All CVs</h2>
 
             {isLoading && (
-                <p className="text-gray-500 text-sm">Loading your CVs...</p>
+                <div className="flex flex-col gap-3">
+                    <CVCardSkeleton />
+                    <CVCardSkeleton />
+                    <CVCardSkeleton />
+                </div>
             )}
 
             {error && (

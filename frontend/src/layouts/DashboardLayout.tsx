@@ -1,5 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth'
+import { ToastContainer } from '../components/ui/Toast'
+import { useToastStore } from '../stores/toast'
 
 interface NavItem {
     label: string
@@ -24,6 +26,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const location = useLocation()
     const navigate = useNavigate()
     const { user, logout } = useAuthStore()
+    const { toasts, removeToast } = useToastStore()
 
     const handleLogout = () => {
         logout()
@@ -93,6 +96,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     {children}
                 </div>
             </main>
+
+            <ToastContainer
+                toasts={toasts}
+                onRemove={removeToast}
+            />
 
         </div>
     )

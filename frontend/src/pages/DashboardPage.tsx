@@ -3,6 +3,7 @@ import { useCVList } from '../hooks/useCVs'
 import { useAuthStore } from '../stores/auth'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
+import { DashboardStatSkeleton } from '../components/ui/Skeleton'
 
 interface QuickAction {
     title: string
@@ -56,20 +57,28 @@ export default function DashboardPage() {
 
             {/* Stats row */}
             <div className="grid grid-cols-3 gap-4 mb-8">
-                <Card padding="sm">
-                    <p className="text-gray-500 text-xs mb-1">CVs uploaded</p>
-                    <p className="text-2xl font-bold text-white">
-                        {isLoading ? '—' : cvs?.length ?? 0}
-                    </p>
-                </Card>
-                <Card padding="sm">
-                    <p className="text-gray-500 text-xs mb-1">Jobs tracked</p>
-                    <p className="text-2xl font-bold text-white">—</p>
-                </Card>
-                <Card padding="sm">
-                    <p className="text-gray-500 text-xs mb-1">Analyses run</p>
-                    <p className="text-2xl font-bold text-white">—</p>
-                </Card>
+                {isLoading ? (
+                    <>
+                        <DashboardStatSkeleton />
+                        <DashboardStatSkeleton />
+                        <DashboardStatSkeleton />
+                    </>
+                ) : (
+                    <>
+                        <Card padding="sm">
+                            <p className="text-gray-500 text-xs mb-1">CVs uploaded</p>
+                            <p className="text-2xl font-bold text-white">{cvs?.length ?? 0}</p>
+                        </Card>
+                        <Card padding="sm">
+                            <p className="text-gray-500 text-xs mb-1">Jobs tracked</p>
+                            <p className="text-2xl font-bold text-white">—</p>
+                        </Card>
+                        <Card padding="sm">
+                            <p className="text-gray-500 text-xs mb-1">Analyses run</p>
+                            <p className="text-2xl font-bold text-white">—</p>
+                        </Card>
+                    </>
+                )}
             </div>
 
             {/* CV status */}
