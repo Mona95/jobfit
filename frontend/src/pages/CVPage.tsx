@@ -6,6 +6,7 @@ import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import Card from '../components/ui/Card'
 import Alert from '../components/ui/Alert'
+import ConfirmModal from '../components/ui/ConfirmModal'
 
 interface UploadFormData {
     title: string
@@ -114,13 +115,19 @@ function CVStatsSection() {
 
 export default function CVPage() {
     const [showUpload, setShowUpload] = useState(false)
+    const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null)
     const { data: cvs, isLoading, error } = useCVList()
     const deleteMutation = useDeleteCV()
 
     const handleDelete = (id: string, title: string) => {
-        if (confirm(`Delete "${title}"? This cannot be undone.`)) {
-            deleteMutation.mutate(id)
-        }
+        setDeleteTarget({ id, title })
+    }
+
+    const confirmDelete = () => {
+        if (!deleteTarget) return
+        deleteMutation.mutate(deleteTarget.id, {
+            onSuccess: () => setDeleteTarget(null)
+        })
     }
 
     return (
@@ -186,7 +193,6 @@ export default function CVPage() {
                                 <Button
                                     variant="danger"
                                     size="sm"
-                                    isLoading={deleteMutation.isPending}
                                     onClick={() => handleDelete(cv.id, cv.title)}
                                 >
                                     Delete
@@ -196,6 +202,15 @@ export default function CVPage() {
                     </Card>
                 ))}
             </div>
+            <ConfirmModal
+                isOpen={!!deleteTarget}
+                title="Delete CV"
+                message={`Are you sure you want to delete "${deleteTarget?.title}"? This will also remove all analysis results linked to this CV. This cannot be undone.`}
+                confirmLabel="Delete CV"
+                isLoading={deleteMutation.isPending}
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteTarget(null)}
+            />
         </div>
     )
 }
