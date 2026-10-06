@@ -6,6 +6,7 @@ export interface CV {
     label: string | null
     content: string
     file_name: string | null
+    file_path: string | null
     created_at: string
     updated_at: string
 }
@@ -15,6 +16,7 @@ export interface CVListItem {
     title: string
     label: string | null
     file_name: string | null
+    file_path: string | null
     created_at: string
 }
 

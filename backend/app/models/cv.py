@@ -13,6 +13,7 @@ class CV(Base):
     label = Column(String, nullable=False)
     content = Column(Text, nullable=False)
     file_name = Column(String, nullable=True)
+    file_path = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

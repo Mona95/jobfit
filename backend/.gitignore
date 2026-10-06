@@ -19,3 +19,4 @@ chroma_db/
 
 # Alembic
 alembic/versions/*.pyc
+uploads/*.pdf

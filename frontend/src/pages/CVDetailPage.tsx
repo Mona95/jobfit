@@ -3,11 +3,33 @@ import { useCV } from '../hooks/useCVs'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import Alert from '../components/ui/Alert'
+import {useEffect, useState} from "react";
+import api from "../api";
 
 export default function CVDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { data: cv, isLoading, error } = useCV(id!)
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
+  const [pdfError, setPdfError] = useState(false)
+
+  useEffect(() => {
+    if (!cv?.file_path) return
+
+    // Fetch PDF as blob through axios — sends JWT token automatically
+    api.get(`/cv/${id}/file`, { responseType: 'blob' })
+        .then(response => {
+          const blob = new Blob([response.data], { type: 'application/pdf' })
+          const url = URL.createObjectURL(blob)
+          setPdfUrl(url)
+        })
+        .catch(() => setPdfError(true))
+
+    // Cleanup blob URL when component unmounts
+    return () => {
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl)
+    }
+  }, [cv?.file_path, id])
 
   if (isLoading) {
     return (
@@ -62,13 +84,39 @@ export default function CVDetailPage() {
         </div>
       </Card>
 
-      {/* CV content */}
-      <Card>
-        <h2 className="text-white font-semibold mb-4">CV Content</h2>
-        <pre className="text-gray-400 text-sm whitespace-pre-wrap leading-relaxed font-mono">
-          {cv.content}
-        </pre>
-      </Card>
+      {/* PDF viewer */}
+      {pdfError && (
+          <Alert type="error" message="Could not load PDF. Showing extracted text instead." />
+      )}
+
+      {pdfUrl && !pdfError ? (
+          <div className="flex-1 rounded-xl overflow-hidden border border-gray-800"
+               style={{ height: 'calc(100vh - 180px)' }}>
+            <iframe
+                src={pdfUrl}
+                className="w-full h-full"
+                title={cv.title}
+            />
+          </div>
+      ) : (
+          !pdfError && (
+              <div className="flex-1 rounded-xl border border-gray-800 bg-gray-900 p-6 overflow-y-auto"
+                   style={{ height: 'calc(100vh - 180px)' }}>
+            <pre className="text-gray-400 text-sm whitespace-pre-wrap leading-relaxed font-mono">
+              {cv.content}
+            </pre>
+              </div>
+          )
+      )}
+
+      {pdfError && (
+          <div className="flex-1 rounded-xl border border-gray-800 bg-gray-900 p-6 overflow-y-auto mt-4"
+               style={{ height: 'calc(100vh - 220px)' }}>
+          <pre className="text-gray-400 text-sm whitespace-pre-wrap leading-relaxed font-mono">
+            {cv.content}
+          </pre>
+          </div>
+      )}
     </div>
   )
 }
