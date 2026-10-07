@@ -235,8 +235,7 @@ export default function CVPage() {
             <ConfirmModal
                 isOpen={!!deleteTarget}
                 title="Delete CV"
-                message={`Are you sure you want to delete "${deleteTarget?.title}"? This will also remove all analysis results linked to this CV. This cannot be undone.`}
-                confirmLabel="Delete CV"
+                message={`Are you sure you want to delete "${deleteTarget?.title}"? This will permanently delete all analysis results, cover letters and interview prep linked to this CV. This cannot be undone.`}                confirmLabel="Delete CV"
                 isLoading={deleteMutation.isPending}
                 onConfirm={confirmDelete}
                 onCancel={() => setDeleteTarget(null)}

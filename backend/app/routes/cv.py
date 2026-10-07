@@ -10,6 +10,7 @@ from app.schemas.cv import CVResponse, CVListResponse, CVUpdate, CVStatsResponse
 from app.services.pdf import extract_text_from_pdf, validate_pdf
 from app.services.rag import index_cv, delete_cv_index
 from app.middleware.auth import get_current_user
+from datetime import datetime
 import os
 
 router = APIRouter(prefix="/api/cv", tags=["cv"])
@@ -75,7 +76,7 @@ def get_cv_stats(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    cvs = db.query(CV).filter(CV.user_id == current_user.id).all()
+    cvs = db.query(CV).filter(CV.user_id == current_user.id, CV.deleted_at.is_(None)).all()
 
     stats = []
     for cv in cvs:
@@ -121,7 +122,8 @@ def get_cv_file(
 ):
     cv = db.query(CV).filter(
         CV.id == cv_id,
-        CV.user_id == current_user.id
+        CV.user_id == current_user.id,
+        CV.deleted_at.is_(None)
     ).first()
 
     if cv is None:
@@ -143,7 +145,8 @@ def get_cvs(
     db: Session = Depends(get_db)
 ):
     return db.query(CV).filter(
-        CV.user_id == current_user.id
+        CV.user_id == current_user.id,
+        CV.deleted_at.is_(None)
     ).order_by(CV.created_at.desc()).all()
 
 
@@ -155,7 +158,8 @@ def get_cv(
 ):
     cv = db.query(CV).filter(
         CV.id == cv_id,
-        CV.user_id == current_user.id
+        CV.user_id == current_user.id,
+        CV.deleted_at.is_(None)
     ).first()
 
     if cv is None:
@@ -196,24 +200,13 @@ def delete_cv(
 ):
     cv = db.query(CV).filter(
         CV.id == cv_id,
-        CV.user_id == current_user.id
+        CV.user_id == current_user.id,
+        CV.deleted_at.is_(None)
     ).first()
 
     if cv is None:
         raise HTTPException(404, detail="CV not found")
 
-    # Delete analysis results first — foreign key constraint
-    db.query(AnalysisResult).filter(
-        AnalysisResult.cv_id == cv_id
-    ).delete()
-
-    # Delete PDF from disk
-    if cv.file_path and os.path.exists(cv.file_path):
-        os.remove(cv.file_path)
-
-    # Remove from ChromaDB
-    delete_cv_index(user_id=current_user.id, cv_id=cv_id)
-
-    db.delete(cv)
+    cv.deleted_at = datetime.utcnow()
     db.commit()
     return None
