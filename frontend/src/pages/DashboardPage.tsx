@@ -59,7 +59,7 @@ export default function DashboardPage() {
 
             {/* Stats row */}
             <div className="grid grid-cols-3 gap-4 mb-8">
-                {isLoading ? (
+                {isLoading || jobsLoading ? (
                     <>
                         <DashboardStatSkeleton />
                         <DashboardStatSkeleton />
