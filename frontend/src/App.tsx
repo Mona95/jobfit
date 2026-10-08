@@ -10,6 +10,7 @@ import JobsPage from './pages/JobsPage'
 import CoverLetterPage from './pages/CoverLetterPage'
 import InterviewPrepPage from './pages/InterviewPrepPage'
 import CVDetailPage from './pages/CVDetailPage.tsx'
+import JobDetailPage from "./pages/JobDetailPage.tsx";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const isAuthenticated = useAuthStore(state => state.isAuthenticated())
@@ -47,6 +48,10 @@ function App() {
 
             <Route path="/cv/:id" element={
                 <ProtectedRoute><CVDetailPage /></ProtectedRoute>
+            } />
+
+            <Route path="/jobs/:id" element={
+                <ProtectedRoute><JobDetailPage /></ProtectedRoute>
             } />
         </Routes>
     )
