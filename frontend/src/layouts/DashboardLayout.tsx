@@ -34,7 +34,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
 
     return (
-        <div className="min-h-screen bg-gray-950 flex">
+        <div className="h-screen bg-gray-950 flex overflow-hidden">
 
             {/* Sidebar */}
             <aside className="w-60 bg-gray-900 border-r border-gray-800 flex flex-col">

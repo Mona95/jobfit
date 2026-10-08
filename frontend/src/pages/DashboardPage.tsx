@@ -4,6 +4,7 @@ import { useAuthStore } from '../stores/auth'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import { DashboardStatSkeleton } from '../components/ui/Skeleton'
+import { useJobList } from '../hooks/useJobs'
 
 interface QuickAction {
     title: string
@@ -42,6 +43,7 @@ const quickActions: QuickAction[] = [
 export default function DashboardPage() {
     const user = useAuthStore(state => state.user)
     const { data: cvs, isLoading } = useCVList()
+    const { data: jobs, isLoading: jobsLoading } = useJobList()
 
     return (
         <div>
@@ -71,11 +73,13 @@ export default function DashboardPage() {
                         </Card>
                         <Card padding="sm">
                             <p className="text-gray-500 text-xs mb-1">Jobs tracked</p>
-                            <p className="text-2xl font-bold text-white">—</p>
+                            <p className="text-2xl font-bold text-white">{jobs?.length ?? 0}</p>
                         </Card>
                         <Card padding="sm">
-                            <p className="text-gray-500 text-xs mb-1">Analyses run</p>
-                            <p className="text-2xl font-bold text-white">—</p>
+                            <p className="text-gray-500 text-xs mb-1">Applied</p>
+                            <p className="text-2xl font-bold text-white">
+                                {jobs?.filter(j => j.status === 'applied').length ?? 0}
+                            </p>
                         </Card>
                     </>
                 )}
