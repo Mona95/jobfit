@@ -147,3 +147,6 @@ FastAPI auto-generates interactive API docs at `http://localhost:3001/docs`
 ## Author
 
 Built by [Mona](https://github.com/Mona95) as part of an AI engineering portfolio.
+
+## Live Demo
+[https://jobfit-blue.vercel.app/dashboard](https://jobfit-blue.vercel.app/dashboard)
