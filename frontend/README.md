@@ -73,3 +73,5 @@ export default defineConfig([
 ])
 
 ```
+## Live Demo
+https://jobfit-blue.vercel.app/dashboard
