@@ -6,6 +6,8 @@ from sqlalchemy import pool
 from alembic import context
 from dotenv import load_dotenv
 
+import os
+from sqlalchemy import create_engine
 from app.models.user import User
 from app.models.cv import CV
 from app.models.job import Job
@@ -57,25 +59,21 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
+def run_migrations_online():
 
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
-
-    """
     load_dotenv()
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+
+    db_url = os.getenv("DATABASE_URL")
+    if not db_url:
+        raise ValueError("DATABASE_URL environment variable not set")
+
+    connectable = create_engine(db_url)
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata
         )
-
         with context.begin_transaction():
             context.run_migrations()
 
